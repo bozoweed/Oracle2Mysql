@@ -109,17 +109,18 @@ namespace Oracle2Mysql.ThreadManager
 
 
         }
+
         public void WaitForEnd(long Totalcount = 0)
         {
             while (AllThread.Count > 0 || AllTask.Count > 0 || Adding )
             {
-                Console.Title = "Queu Left : " + (Totalcount) + " | " + execS + " Request Seconde | Thread Running "+ AllThread.Count+ " | Thread Task Queu "+ AllTask.Count;
+                Console.Title = (Totalcount > 0 ? "Queu Left : " + (Totalcount) + " | " :"" )+ execS + " Request Seconde | Thread Running "+ AllThread.Count+ " | Thread Task Queu "+ AllTask.Count;
                 Totalcount -= execS;
                 execS = 0;
                 System.Threading.Thread.Sleep(1000);
             }
 
-            Console.Title = "Queu Left : " + (Totalcount) + " | " + execS + " Request Seconde | Thread Running " + AllThread.Count + " | Thread Task Queu " + AllTask.Count;
+            Console.Title = (Totalcount > 0 ? "Queu Left : " + (Totalcount) + " | " : "") + execS + " Request Seconde | Thread Running " + AllThread.Count + " | Thread Task Queu " + AllTask.Count;
         }
     }
 }
