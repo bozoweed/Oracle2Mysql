@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "xie0rSUzWantYyFFPpqow/a6zNXBcZDxDK2yDq1NxsRHUXTT1mHx9N6FupGmDwT8q+5ghkkCWLufO+kgq+Sy3w==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\Bozoweed\\source\\repos\\Oracle2Mysql\\Oracle2Mysql\\Oracle2Mysql.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Bozoweed\\.nuget\\packages\\system.security.principal.windows\\5.0.0\\system.security.principal.windows.5.0.0.nupkg.sha512"
+  ],
+  "logs": []
+}

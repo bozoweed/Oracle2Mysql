@@ -1,0 +1,17 @@
+C:\Users\Bozoweed\source\repos\Oracle2Mysql\Oracle2Mysql\obj\Debug\netcoreapp3.1\Oracle2Mysql.csprojAssemblyReference.cache
+C:\Users\Bozoweed\source\repos\Oracle2Mysql\Oracle2Mysql\obj\Debug\netcoreapp3.1\Oracle2Mysql.AssemblyInfoInputs.cache
+C:\Users\Bozoweed\source\repos\Oracle2Mysql\Oracle2Mysql\obj\Debug\netcoreapp3.1\Oracle2Mysql.AssemblyInfo.cs
+C:\Users\Bozoweed\source\repos\Oracle2Mysql\Oracle2Mysql\obj\Debug\netcoreapp3.1\Oracle2Mysql.csproj.CoreCompileInputs.cache
+C:\Users\Bozoweed\source\repos\Oracle2Mysql\Oracle2Mysql\bin\Debug\netcoreapp3.1\Oracle2Mysql.exe
+C:\Users\Bozoweed\source\repos\Oracle2Mysql\Oracle2Mysql\bin\Debug\netcoreapp3.1\Oracle2Mysql.deps.json
+C:\Users\Bozoweed\source\repos\Oracle2Mysql\Oracle2Mysql\bin\Debug\netcoreapp3.1\Oracle2Mysql.runtimeconfig.json
+C:\Users\Bozoweed\source\repos\Oracle2Mysql\Oracle2Mysql\bin\Debug\netcoreapp3.1\Oracle2Mysql.runtimeconfig.dev.json
+C:\Users\Bozoweed\source\repos\Oracle2Mysql\Oracle2Mysql\bin\Debug\netcoreapp3.1\Oracle2Mysql.dll
+C:\Users\Bozoweed\source\repos\Oracle2Mysql\Oracle2Mysql\bin\Debug\netcoreapp3.1\Oracle2Mysql.pdb
+C:\Users\Bozoweed\source\repos\Oracle2Mysql\Oracle2Mysql\bin\Debug\netcoreapp3.1\System.Security.Principal.Windows.dll
+C:\Users\Bozoweed\source\repos\Oracle2Mysql\Oracle2Mysql\bin\Debug\netcoreapp3.1\runtimes\unix\lib\netcoreapp2.1\System.Security.Principal.Windows.dll
+C:\Users\Bozoweed\source\repos\Oracle2Mysql\Oracle2Mysql\bin\Debug\netcoreapp3.1\runtimes\win\lib\netcoreapp2.1\System.Security.Principal.Windows.dll
+C:\Users\Bozoweed\source\repos\Oracle2Mysql\Oracle2Mysql\obj\Debug\netcoreapp3.1\Oracle2Mysql.csproj.CopyComplete
+C:\Users\Bozoweed\source\repos\Oracle2Mysql\Oracle2Mysql\obj\Debug\netcoreapp3.1\Oracle2Mysql.dll
+C:\Users\Bozoweed\source\repos\Oracle2Mysql\Oracle2Mysql\obj\Debug\netcoreapp3.1\Oracle2Mysql.pdb
+C:\Users\Bozoweed\source\repos\Oracle2Mysql\Oracle2Mysql\obj\Debug\netcoreapp3.1\Oracle2Mysql.genruntimeconfig.cache
