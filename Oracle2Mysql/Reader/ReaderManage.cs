@@ -48,7 +48,7 @@ namespace Oracle2Mysql.Reader
             [" DOUBLE("] = " ,0)",
             ["/*DEFAULT SUBSTR"] = @")*/,",
             ["ALTER TABLE"] = " COMMENT ",
-            ["STR_TO_DATE"] = " COMMENT ",
+            ["STR_TO_DATE"] = "%Y-%m-%d %h:%i:%s",
         };
         public ReaderManage(Program ba)
         {
