@@ -1,6 +1,6 @@
 {
   "thread": 12,
-  "threadSleep": 2,
+  "threadSleep": 0,
   "linePerSql": 300000,
   "debug": false
 }

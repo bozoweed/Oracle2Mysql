@@ -48,6 +48,7 @@ namespace Oracle2Mysql.Reader
             [" DOUBLE("] = " ,0)",
             ["/*DEFAULT SUBSTR"] = @")*/,",
             ["ALTER TABLE"] = " COMMENT ",
+            ["STR_TO_DATE"] = " COMMENT ",
         };
         public ReaderManage(Program ba)
         {
@@ -179,40 +180,54 @@ namespace Oracle2Mysql.Reader
         private void MadeFile(int index)
         {
             Base.ThreadManager.AddAsyncTask(() => {
-                List<string> Converted = new List<string>();
+                List<Task<string>> Converted = new List<Task<string>>();
                 foreach (string line in allText[index])
                     Converted.Add( ConvertLine(line));
-                File.AppendAllLines(@".\AllSql\Sql" + index + ".sql", Converted);
+                Task.WhenAll(Converted);
+                List<string> conv = new List<string>();
+                foreach (Task<string> line in Converted)
+                    conv.Add(line.Result);
+                File.AppendAllLines(@".\AllSql\Sql" + index + ".sql", conv);
                 allText[index].Clear();
                 Converted.Clear();
+                conv.Clear();
             });
         }
 
-        private string ConvertLine(string line)
+        private Task<string> ConvertLine(string line)
         {
-            string ret = line;
-            foreach (string key in AllReplace.Keys)
+            TaskCompletionSource<string> s_tcs = new TaskCompletionSource<string>();
+            Base.ThreadManager.AddAsyncTask(() =>
             {
-                ret = ret.Replace(key, AllReplace[key]);                
-            }
-            foreach (string key in AllFixReplace.Keys)
-            {
-                if(ret.Contains(key))
-                    switch (key)
-                    {
-                        case " DOUBLE(":
-                            ret = ret.Replace(")", AllFixReplace[key]);
-                            break;
-                        case "/*DEFAULT SUBSTR":
-                            ret = ret.Replace("),", AllFixReplace[key]).Replace(") COMMENT", @")*/ COMMENT");
-                            break;
-                        case "ALTER TABLE":
-                            ret = ret.Replace(" IS ", AllFixReplace[key]);
-                            break;
 
-                    }
-            }
-            return ret;
+                string ret = line;
+                foreach (string key in AllReplace.Keys)
+                {
+                    ret = ret.Replace(key, AllReplace[key]);
+                }
+                foreach (string key in AllFixReplace.Keys)
+                {
+                    if (ret.Contains(key))
+                        switch (key)
+                        {
+                            case " DOUBLE(":
+                                ret = ret.Replace(")", AllFixReplace[key]);
+                                break;
+                            case "/*DEFAULT SUBSTR":
+                                ret = ret.Replace("),", AllFixReplace[key]).Replace(") COMMENT", @")*/ COMMENT");
+                                break;
+                            case "ALTER TABLE":
+                                ret = ret.Replace(" IS ", AllFixReplace[key]);
+                                break;
+                            case "STR_TO_DATE":
+                                ret = ret.Replace("SYYYY-MM-DD HH24:MI:SS", AllFixReplace[key]);
+                                break;
+
+                        }
+                }
+                s_tcs.SetResult(ret);
+            });
+            return s_tcs.Task;
         }
         
     }
