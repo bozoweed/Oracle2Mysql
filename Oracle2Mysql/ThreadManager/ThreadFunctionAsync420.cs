@@ -21,10 +21,11 @@ namespace Oracle2Mysql.ThreadManager
 
         public override void Start()
         {
-            DateTime beginTime420 = DateTime.Now;
-            Base.ThreadManager.TaskStarted(DateTime.Now.Subtract(base.CreatedAt).TotalMilliseconds);
+            //DateTime beginTime420 = DateTime.Now;
+            //Base.ThreadManager.TaskStarted(DateTime.Now.Subtract(base.CreatedAt).TotalMilliseconds);
             Func();
-            Base.ThreadManager.TaskEnded(DateTime.Now.Subtract(beginTime420).TotalMilliseconds); 
+            //Base.ThreadManager.TaskEnded(DateTime.Now.Subtract(beginTime420).TotalMilliseconds); 
+            Base.ThreadManager.TaskEnded();
         }
     }
 

@@ -14,7 +14,13 @@ namespace Oracle2Mysql.Reader
         Dictionary<string, string> AllReplace = new Dictionary<string, string>()
         {
             [" CHAR("] = " VARCHAR(",
+            ["/**"] = "/*",
+            ["**/"] = "*/",
+            ["**/"] = "*/",
+            ["DROP SEQUENCE"] = "-- DROP SEQUENCE",
+            ["CREATE SEQUENCE"] = "-- CREATE SEQUENCE",
             ["LOGGING"] = "/*LOGGING",
+            ["USABLE;"] = "USABLE;*/",
             ["DISABLE ROW MOVEMENT"] = "DISABLE ROW MOVEMENT*/",
             ["DROP TABLE"] = "DROP TABLE IF EXISTS",
             [" VARCHAR2("] = " VARCHAR(",
@@ -47,8 +53,10 @@ namespace Oracle2Mysql.Reader
         {
             [" DOUBLE("] = " ,0)",
             ["/*DEFAULT SUBSTR"] = @")*/,",
+            ["ADD CONSTRAINT"] = "-- ALTER TABLE",
             ["ALTER TABLE"] = " COMMENT ",
             ["STR_TO_DATE"] = "%Y-%m-%d %h:%i:%s",
+            ["NOT DEFERRABLE INITIALLY IMMEDIATE NORELY VALIDATE"] = "-- ",
         };
         public ReaderManage(Program ba)
         {
@@ -69,11 +77,96 @@ namespace Oracle2Mysql.Reader
             allText.Clear();
         }
 
+
+        private List<string> RemoveCreatView(List<string> LinesReade)
+        {
+            bool creatview = false;
+            for (int i = 0; i < LinesReade.Count; i++)
+            {
+                string line = LinesReade[i];
+                if (line.Contains("CREATE OR REPLACE VIEW"))
+                {
+                    creatview = true;
+                    line = line.Replace("CREATE OR REPLACE VIEW", "/* CREATE OR REPLACE VIEW");
+                }
+
+                if (creatview )
+                {
+                    if (line.Contains("*/"))
+                        line = line.Replace("*/", "");
+                    if (line.Contains(";"))
+                    {
+                        line = line.Replace(";", "; */");
+                        creatview = false;
+                    }
+                }
+                LinesReade[i] = line;
+            }
+            return RemoveCreatTrigger(LinesReade);
+        }
+
+        private List<string> RemoveCreatTrigger(List<string> LinesReade)
+        {
+            bool creatview = false;
+            for (int i = 0; i < LinesReade.Count; i++)
+            {
+                string line = LinesReade[i];
+                if (line.Contains("CREATE TRIGGER"))
+                {
+                    creatview = true;
+                    line = line.Replace("CREATE TRIGGER", "/* CREATE TRIGGER");
+                }
+
+                if (creatview)
+                {
+                    if (line.Contains("*/"))
+                        line = line.Replace("*/", "");
+                    if (line.Length == 1 && line.Contains("/") && !line.Contains("/*"))
+                    {
+                        
+                        
+                            line = line.Replace("/", "*/");
+                            creatview = false;
+                        
+                    }
+                }
+                LinesReade[i] = line;
+            }
+            return FixCreatIndex(LinesReade);
+        }
+
+        private List<string> FixCreatIndex(List<string> LinesReade)
+        {
+            bool creatview = false;
+            for (int i = 0; i < LinesReade.Count; i++)
+            {
+                string line = LinesReade[i];
+                if (line.Contains("CREATE INDEX") || line.Contains("CREATE UNIQUE INDEX"))
+                {
+                    creatview = true;
+                }
+
+                if (creatview && line.Contains("ON "))
+                {
+
+                   
+                    line = line.Replace("ASC", "").Replace("DESC", "").Replace(")", ");");
+                    creatview = false;
+                   
+                }
+                LinesReade[i] = line;
+            }
+            return LinesReade;
+        }
+
+
         private void GenerateTable(List<string> LinesReade)
         {
             bool table = false;
             string current_table = "";
+            string db_name = "";
             int current_lines = 0;
+            LinesReade = RemoveCreatView(LinesReade);
             List<int> readed = new List<int>();
             List<Task<string>> TaskQueu = new List<Task<string>>();
             for (int i= 0; i<LinesReade.Count; i++)
@@ -84,10 +177,14 @@ namespace Oracle2Mysql.Reader
 
                 if (line.Contains("DROP TABLE") || line.Contains("CREATE TABLE"))
                 {
+                    if (db_name == "")
+                        db_name = line.Split("\".\"")[0].Split("\"")[1].Trim();
                     if(line.Contains("DROP TABLE"))
                         current_table = line.Replace("DROP TABLE ", "").Replace(";", "");
                     table = true;
                 }
+                line = line.Replace("\"" + db_name + "\".","");
+                LinesReade[i] = line;
                 if (table)
                 {
                     readed.Add(current_lines);
@@ -119,6 +216,7 @@ namespace Oracle2Mysql.Reader
         {
             int current_index = 1;
             int current_lines = 0;
+            int last_index_donne = 0;
             foreach (string line in LinesReade)
             {
                 if (!readed.Contains(current_lines))
@@ -128,12 +226,15 @@ namespace Oracle2Mysql.Reader
                     allText[current_index].Add(line);
                     if ((line.Length == 0 || line.Contains(";")) && allText[current_index].Count > Base.Config.Config().LinePerSql)
                     {
+                        last_index_donne = current_index;
                         MadeFile(current_index);
                         current_index++;
                     }
                 }
                 current_lines++;
             }
+            if(last_index_donne != current_index)
+                MadeFile(current_index);
             readed.Clear();
             LinesReade.Clear();
         }
@@ -221,6 +322,12 @@ namespace Oracle2Mysql.Reader
                                 break;
                             case "STR_TO_DATE":
                                 ret = ret.Replace("SYYYY-MM-DD HH24:MI:SS", AllFixReplace[key]);
+                                break;
+                            case "ADD CONSTRAINT":
+                                ret = ret.Replace("ALTER TABLE", AllFixReplace[key]);
+                                break;
+                            case "NOT DEFERRABLE INITIALLY IMMEDIATE NORELY VALIDATE":
+                                ret =  AllFixReplace[key] + ret;
                                 break;
 
                         }

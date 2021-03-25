@@ -10,7 +10,7 @@ namespace Oracle2Mysql.ThreadManager
     {
         Program Base;
         public List<Thread420> AllThread = new List<Thread420>();
-        public List< ThreadFunction420> AllTask = new List<ThreadFunction420 > ();
+        public List<ThreadFunction420> AllTask = new List<ThreadFunction420>();
         public int RequetteId = -1;
         public bool Stopped = false;
         public bool Adding = false;
@@ -34,8 +34,8 @@ namespace Oracle2Mysql.ThreadManager
             if (Base.Config.Config().Debug && drawed > 4)
             {
                 drawed = 0;
-                Base.Log("---------[Server Thread Executed in Minimum " + MinExecTime + " | Max " + MaxExecTime + "]---------");
-                Base.Log("---------[Server Thread Time In Queue Minimum " + MinQueueTime + " | Max " + MaxQueueTime + "]---------");
+                /*Base.Log("---------[Server Thread Executed in Minimum " + MinExecTime + " | Max " + MaxExecTime + "]---------");
+                Base.Log("---------[Server Thread Time In Queue Minimum " + MinQueueTime + " | Max " + MaxQueueTime + "]---------");*/
 
 
             }
@@ -54,12 +54,16 @@ namespace Oracle2Mysql.ThreadManager
             if (timeInQueue > MaxQueueTime)
                 MaxQueueTime = timeInQueue;
         }
-        public void TaskEnded(double ExecTime)
+        /*public void TaskEnded(double ExecTime)
         {
             if (MinExecTime > ExecTime)
                 MinExecTime = ExecTime;
             if (ExecTime > MaxExecTime)
                 MaxExecTime = ExecTime;
+            execS++;
+        }*/
+        public void TaskEnded()
+        {
             execS++;
         }
 
@@ -68,15 +72,16 @@ namespace Oracle2Mysql.ThreadManager
 
 
             lock (AllTask)
-            {
+                lock (AllThread)
+                {
 
-                Adding = true;
-                RequetteId++;
-                AllTask.Add( new ThreadFunctionAsync420(Base, RequetteId, func));
-                if (AllThread.Count < Base.Config.Config().Thread)
-                    AllThread.Add(new Thread420(Base));
+                    Adding = true;
+                    RequetteId++;
+                    AllTask.Add(new ThreadFunctionAsync420(Base, RequetteId, func));
+                    if (AllThread.Count < Base.Config.Config().Thread)
+                        AllThread.Add(new Thread420(Base));
 
-            }
+                }
 
             Adding = false;
         }
@@ -84,27 +89,29 @@ namespace Oracle2Mysql.ThreadManager
         public void AddAsyncCallBackTask(Action func, Action callBack)
         {
             lock (AllTask)
-            {
-                Adding = true;
-                RequetteId++;
-                AllTask.Add( new ThreadFunctionAsyncCallBack420(Base, RequetteId, func, callBack));
-                if (AllThread.Count < Base.Config.Config().Thread)
-                    AllThread.Add(new Thread420(Base));
+                lock (AllThread)
+                {
+                    Adding = true;
+                    RequetteId++;
+                    AllTask.Add(new ThreadFunctionAsyncCallBack420(Base, RequetteId, func, callBack));
+                    if (AllThread.Count < Base.Config.Config().Thread)
+                        AllThread.Add(new Thread420(Base));
 
-            }
+                }
             Adding = false;
         }
 
         public void RemoveKilledThread(Thread420 thread)
         {
-            lock (AllThread)
-            {
-                AllThread.Remove(thread);
-                if (AllThread.Count == 0 && AllTask.Count > 0 && !Adding)
-                    Base.LogWarning("All Thread are stopped but " + AllTask.Count + " execution left"); 
-                for (int i = AllTask.Count > Base.Config.Config().Thread ? Base.Config.Config().Thread : AllTask.Count; i > 0; i--)
-                    AllThread.Add(new Thread420(Base));
-            }
+            lock (AllTask)
+                lock (AllThread)
+                {
+                    AllThread.Remove(thread);
+                    if (AllThread.Count == 0 && AllTask.Count > 0 && !Adding)
+                        Base.LogWarning("All Thread are stopped but " + AllTask.Count + " execution left");
+                    while (AllTask.Count > Base.Config.Config().Thread && AllThread.Count < Base.Config.Config().Thread)
+                        AllThread.Add(new Thread420(Base));
+                }
 
 
 
@@ -112,9 +119,9 @@ namespace Oracle2Mysql.ThreadManager
 
         public void WaitForEnd(long Totalcount = 0)
         {
-            while (AllThread.Count > 0 || AllTask.Count > 0 || Adding )
+            while (AllThread.Count > 0 || AllTask.Count > 0 || Adding)
             {
-                Console.Title = (Totalcount > 0 ? "Queu Left : " + (Totalcount) + " | " :"" )+ execS + " Request Seconde | Thread Running "+ AllThread.Count+ " | Thread Task Queu "+ AllTask.Count;
+                Console.Title = (Totalcount > 0 ? "Queu Left : " + (Totalcount) + " | " : "") + execS + " Request Seconde | Thread Running " + AllThread.Count + " | Thread Task Queu " + AllTask.Count;
                 Totalcount -= execS;
                 execS = 0;
                 System.Threading.Thread.Sleep(1000);
