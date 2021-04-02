@@ -15,8 +15,6 @@ namespace Oracle2Mysql.ThreadManager
         public bool Stopped = false;
         public bool Adding = false;
         Timer Debug = new Timer(1000);
-        double MinExecTime = 9;
-        double MaxExecTime = 0;
         double MinQueueTime = 9;
         double MaxQueueTime = 0;
         int drawed = 0;
@@ -41,8 +39,6 @@ namespace Oracle2Mysql.ThreadManager
             }
             drawed++;
 
-            MinExecTime = 9;
-            MaxExecTime = 0;
             MinQueueTime = 9;
             MaxQueueTime = 0;
         }
@@ -109,7 +105,7 @@ namespace Oracle2Mysql.ThreadManager
                     AllThread.Remove(thread);
                     if (AllThread.Count == 0 && AllTask.Count > 0 && !Adding)
                         Base.LogWarning("All Thread are stopped but " + AllTask.Count + " execution left");
-                    while (AllTask.Count > Base.Config.Config().Thread && AllThread.Count < Base.Config.Config().Thread)
+                    while (AllTask.Count > AllThread.Count && AllThread.Count < Base.Config.Config().Thread)
                         AllThread.Add(new Thread420(Base));
                 }
 

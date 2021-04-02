@@ -55,7 +55,7 @@ namespace Oracle2Mysql.Reader
             ["/*DEFAULT SUBSTR"] = @")*/,",
             ["ADD CONSTRAINT"] = "-- ALTER TABLE",
             ["ALTER TABLE"] = " COMMENT ",
-            ["STR_TO_DATE"] = "%Y-%m-%d %h:%i:%s",
+            ["STR_TO_DATE"] = "%Y-%m-%d %H:%i:%s",
             ["NOT DEFERRABLE INITIALLY IMMEDIATE NORELY VALIDATE"] = "-- ",
         };
         public ReaderManage(Program ba)
@@ -280,6 +280,7 @@ namespace Oracle2Mysql.Reader
 
         private void MadeFile(int index)
         {
+            
             Base.ThreadManager.AddAsyncTask(() => {
                 List<Task<string>> Converted = new List<Task<string>>();
                 foreach (string line in allText[index])
